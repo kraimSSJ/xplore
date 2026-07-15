@@ -347,9 +347,7 @@ export async function updateUserRole(id: string, role: UserRole): Promise<void> 
   throwIfError(error);
 }
 
-export async function disableUser(id: string): Promise<void> {
-  // Soft-delete: blocks the account via RLS (is_active()) without needing
-  // the service_role key to remove the underlying Auth user.
-  const { error } = await supabase.from('profiles').update({ disabled: true }).eq('id', id);
-  throwIfError(error);
+export async function deleteUser(id: string): Promise<void> {
+  const { error } = await supabase.rpc('admin_delete_user', { target_user_id: id });
+  if (error) throw new Error(error.message);
 }
