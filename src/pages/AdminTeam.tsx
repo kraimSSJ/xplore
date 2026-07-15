@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createTeamMember, disableUser, fetchUsers, updateUserRole } from '../lib/api';
+import { createTeamMember, deleteUser, fetchUsers, updateUserRole } from '../lib/api';
 import { User, UserRole } from '../types';
 
 const emptyForm = { email: '', password: '', fullName: '', role: 'member' as UserRole };
