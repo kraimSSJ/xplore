@@ -9,6 +9,7 @@ import {
   uploadProductPhoto,
 } from '../lib/api';
 import { Product } from '../types';
+import { useTheme } from '../context/ThemeContext';
 
 const emptyForm = {
   id: '',
@@ -18,9 +19,11 @@ const emptyForm = {
   category: '',
   description: '',
   photoUrl: '',
+  section: 'blue' as 'blue' | 'pink',
 };
 
 export default function AdminProducts() {
+  const { section } = useTheme();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -33,18 +36,21 @@ export default function AdminProducts() {
   const [rate, setRate] = useState<number | null>(null);
   const [rateDraft, setRateDraft] = useState('');
   const [rateSaving, setRateSaving] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     loadProducts();
     loadRate();
-  }, []);
+  }, [section]);
 
   async function loadProducts() {
     setLoading(true);
+    setLoadError('');
     try {
-      setProducts(await fetchProducts());
-    } catch (e) {
-      // ignore
+      setProducts(await fetchProducts(section));
+    } catch (e: any) {
+      console.error('Failed to load products:', e);
+      setLoadError(e.message || 'Failed to load products');
     } finally {
       setLoading(false);
     }
@@ -56,7 +62,7 @@ export default function AdminProducts() {
       setRate(r);
       setRateDraft(String(r));
     } catch (e) {
-      // ignore
+      console.error('Failed to load exchange rate:', e);
     }
   }
 
@@ -76,7 +82,7 @@ export default function AdminProducts() {
   }
 
   function openCreate() {
-    setForm(emptyForm);
+    setForm({ ...emptyForm, section });
     setIsEditing(false);
     setError('');
     setShowModal(true);
@@ -91,6 +97,7 @@ export default function AdminProducts() {
       category: product.category,
       description: product.description || '',
       photoUrl: product.photoUrl || '',
+      section: product.section,
     });
     setIsEditing(true);
     setError('');
@@ -122,6 +129,7 @@ export default function AdminProducts() {
         category: form.category || 'Uncategorized',
         description: form.description,
         photoUrl: form.photoUrl,
+        section: form.section,
       };
       if (isEditing) {
         await updateProduct(form.id, payload);
@@ -131,6 +139,7 @@ export default function AdminProducts() {
       setShowModal(false);
       loadProducts();
     } catch (e: any) {
+      console.error('Failed to save product:', e);
       setError(e.message || 'Failed to save product');
     }
   }
@@ -141,8 +150,9 @@ export default function AdminProducts() {
       await deleteProduct(deleteTarget.id);
       setDeleteTarget(null);
       loadProducts();
-    } catch (e) {
-      // ignore
+    } catch (e: any) {
+      console.error('Failed to delete product:', e);
+      setLoadError(e.message || 'Failed to delete product');
     }
   }
 
@@ -154,7 +164,12 @@ export default function AdminProducts() {
       <div className="page-header">
         <div>
           <h1>Manage Products</h1>
-          <p>Add, edit, or remove products from the shared catalog.</p>
+          <p>
+            Add, edit, or remove products.{' '}
+            <span className="section-pill">
+              {section === 'pink' ? 'Cosmetics catalogue' : 'Electronics catalogue'}
+            </span>
+          </p>
         </div>
         <button className="btn btn-primary" onClick={openCreate}>
           + Add Product
@@ -184,10 +199,14 @@ export default function AdminProducts() {
         </p>
       </div>
 
+      {loadError && <div className="error-banner">{loadError}</div>}
+
       {loading && <div className="empty-state">Loading products...</div>}
 
       {!loading && products.length === 0 && (
-        <div className="empty-state">No products yet. Click "Add Product" to start the catalog.</div>
+        <div className="empty-state">
+          No products in this catalogue yet. Click "Add Product" to start it.
+        </div>
       )}
 
       {!loading && products.length > 0 && (
@@ -246,6 +265,25 @@ export default function AdminProducts() {
             <h3>{isEditing ? 'Edit Product' : 'Add Product'}</h3>
             {error && <div className="error-banner">{error}</div>}
             <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Catalogue</label>
+                <div className="section-toggle">
+                  <button
+                    type="button"
+                    className={`section-toggle-btn${form.section === 'blue' ? ' active' : ''}`}
+                    onClick={() => setForm({ ...form, section: 'blue' })}
+                  >
+                    Electronics
+                  </button>
+                  <button
+                    type="button"
+                    className={`section-toggle-btn pink${form.section === 'pink' ? ' active' : ''}`}
+                    onClick={() => setForm({ ...form, section: 'pink' })}
+                  >
+                    Cosmetics
+                  </button>
+                </div>
+              </div>
               <div className="form-group">
                 <label>Photo</label>
                 {form.photoUrl && (
