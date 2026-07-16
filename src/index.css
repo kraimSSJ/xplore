@@ -86,6 +86,10 @@ input, select, textarea {
   flex-direction: column;
   padding: 24px 0;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .sidebar-logo {
