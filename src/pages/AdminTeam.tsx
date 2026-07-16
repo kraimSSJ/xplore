@@ -10,7 +10,7 @@ export default function AdminTeam() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -51,14 +51,29 @@ export default function AdminTeam() {
     loadUsers();
   }
 
-  async function confirmDelete() {
-    if (!deleteTarget) return;
+  function handleDeleteClick(user: User) {
+    // plain browser confirm() — no custom modal, no overlay, no z-index,
+    // nothing that can silently swallow a click. If this alert doesn't
+    // even pop up, the button click isn't reaching React at all.
+    window.alert('DELETE BUTTON CLICKED for ' + user.fullName);
+
+    const ok = window.confirm(
+      `Permanently delete ${user.fullName} (${user.email})? This cannot be undone.`,
+    );
+    if (!ok) return;
+    runDelete(user.id);
+  }
+
+  async function runDelete(id: string) {
+    setBusyId(id);
     try {
-      await disableUser(deleteTarget.id);
-      setDeleteTarget(null);
+      await deleteUser(id);
+      window.alert('Deleted successfully.');
       loadUsers();
-    } catch (e) {
-      // ignore
+    } catch (e: any) {
+      window.alert('DELETE FAILED: ' + (e?.message || String(e)));
+    } finally {
+      setBusyId(null);
     }
   }
 
@@ -102,8 +117,13 @@ export default function AdminTeam() {
                       <button className="btn btn-secondary btn-sm" onClick={() => handleRoleToggle(user)}>
                         Make {user.role === 'admin' ? 'Member' : 'Admin'}
                       </button>
-                      <button className="btn btn-danger btn-sm" onClick={() => setDeleteTarget(user)}>
-                        Delete
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        disabled={busyId === user.id}
+                        onClick={() => handleDeleteClick(user)}
+                      >
+                        {busyId === user.id ? 'Deleting...' : 'Delete'}
                       </button>
                     </div>
                   </td>
@@ -170,26 +190,6 @@ export default function AdminTeam() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {deleteTarget && (
-        <div className="modal-overlay" onClick={() => setDeleteTarget(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h3>Disable Account</h3>
-            <p>
-              Are you sure you want to disable <strong>{deleteTarget.fullName}</strong>'s account? They
-              will no longer be able to sign in or access the app.
-            </p>
-            <div className="modal-actions">
-              <button className="btn btn-secondary" onClick={() => setDeleteTarget(null)}>
-                Cancel
-              </button>
-              <button className="btn btn-danger" onClick={confirmDelete}>
-                Disable
-              </button>
-            </div>
           </div>
         </div>
       )}
