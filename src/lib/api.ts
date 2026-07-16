@@ -346,7 +346,6 @@ export async function updateUserRole(id: string, role: UserRole): Promise<void> 
   const { error } = await supabase.from('profiles').update({ role }).eq('id', id);
   throwIfError(error);
 }
-
 export async function deleteUser(id: string): Promise<void> {
   const { error } = await supabase.rpc('admin_delete_user', { target_user_id: id });
   if (error) throw new Error(error.message);
