@@ -1,26 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { getTheme, setTheme } from '../lib/theme';
+import { useTheme } from '../context/ThemeContext';
 import CartDrawer from './CartDrawer';
+
+function SectionSwitch({ compact }: { compact?: boolean }) {
+  const { section, setSection } = useTheme();
+  const isPink = section === 'pink';
+  return (
+    <button
+      type="button"
+      className={`mode-toggle${compact ? ' compact' : ''}`}
+      aria-pressed={isPink}
+      aria-label="Switch between electronics and cosmetics catalogue"
+      onClick={() => setSection(isPink ? 'blue' : 'pink')}
+    >
+      <span className={`mode-toggle-label${!isPink ? ' active' : ''}`}>Electronics</span>
+      <span className="mode-toggle-track" data-active={section}>
+        <span className="mode-toggle-thumb">
+          <svg className="mode-toggle-icon icon-bolt" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
+          </svg>
+          <svg className="mode-toggle-icon icon-heart" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21s-7.2-4.6-9.8-9.1C.6 8.6 1.8 5 5.2 4.1c2-.5 3.9.3 5.1 1.9C11.5 4.4 13.4 3.6 15.4 4.1c3.4.9 4.6 4.5 3 7.8C19.2 16.4 12 21 12 21z" />
+          </svg>
+        </span>
+      </span>
+      <span className={`mode-toggle-label${isPink ? ' active' : ''}`}>Cosmetics</span>
+    </button>
+  );
+}
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const { totalItems, openCart } = useCart();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [pink, setPink] = useState(() => getTheme() === 'pink');
-
-  useEffect(() => {
-    setTheme(pink ? 'pink' : 'default');
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function toggleTheme() {
-    const next = !pink;
-    setPink(next);
-    setTheme(next ? 'pink' : 'default');
-  }
 
   function handleLogout() {
     logout();
@@ -45,18 +61,6 @@ export default function Layout() {
       <div className="mobile-topbar">
         <img src="/logo.jpeg" alt="Xplore" />
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <button
-            type="button"
-            className="theme-switch"
-            aria-pressed={pink}
-            aria-label="Toggle pink theme"
-            onClick={toggleTheme}
-          >
-            <span className="theme-switch-track">
-              <span className="theme-switch-thumb" />
-            </span>
-            <span className="theme-switch-label">{pink ? 'Pink' : 'Blue'}</span>
-          </button>
           <button className="icon-btn" onClick={openCart}>
             Cart {totalItems > 0 && `(${totalItems})`}
           </button>
@@ -64,6 +68,9 @@ export default function Layout() {
             {user?.fullName?.split(' ')[0] || 'Account'}
           </button>
         </div>
+      </div>
+      <div className="mobile-section-bar">
+        <SectionSwitch compact />
       </div>
 
       {menuOpen && (
@@ -93,6 +100,9 @@ export default function Layout() {
         <div className="sidebar-logo">
           <img src="/logo.jpeg" alt="Xplore" />
         </div>
+        <div className="sidebar-section-row">
+          <SectionSwitch />
+        </div>
         <nav className="sidebar-nav">
           {navItems.map((item) => (
             <NavLink
@@ -104,20 +114,6 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
-        <div className="sidebar-theme-row">
-          <button
-            type="button"
-            className="theme-switch"
-            aria-pressed={pink}
-            aria-label="Toggle pink theme"
-            onClick={toggleTheme}
-          >
-            <span className="theme-switch-track">
-              <span className="theme-switch-thumb" />
-            </span>
-            <span className="theme-switch-label">{pink ? 'Pink' : 'Blue'}</span>
-          </button>
-        </div>
         <div className="sidebar-footer">
           <div className="sidebar-user">
             <strong>{user?.fullName}</strong>
