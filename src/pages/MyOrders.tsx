@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchMyOrders } from '../lib/api';
+import { fetchMyOrders, fetchOrder } from '../lib/api';
 import { downloadOrderPdf } from '../lib/pdf';
 import { Order } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -21,13 +21,24 @@ export default function MyOrders() {
 
   async function loadOrders() {
     if (!user) return;
-    setLoading(true);
     try {
       setOrders(await fetchMyOrders(user.id));
     } catch (e) {
       // ignore
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleDownloadPdf(order: Order) {
+    // Fetch the freshest copy right before generating, in case an Admin
+    // changed shipping/quantities/items since this list was last loaded.
+    try {
+      const fresh = await fetchOrder(order.id);
+      await downloadOrderPdf(fresh);
+    } catch (e) {
+      console.error('Failed to fetch latest order before generating PDF:', e);
+      await downloadOrderPdf(order);
     }
   }
 
@@ -81,7 +92,7 @@ export default function MyOrders() {
                   <td>
                     <button
                       className="btn btn-secondary btn-sm"
-                      onClick={() => downloadOrderPdf(order)}
+                      onClick={() => handleDownloadPdf(order)}
                     >
                       Download PDF
                     </button>
