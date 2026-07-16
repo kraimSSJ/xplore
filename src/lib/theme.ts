@@ -1,9 +1,9 @@
 const THEME_KEY = 'xplore-theme';
 
-export type ThemeName = 'default' | 'pink';
+export type ThemeName = 'blue' | 'pink';
 
 export function getTheme(): ThemeName {
-  return localStorage.getItem(THEME_KEY) === 'pink' ? 'pink' : 'default';
+  return localStorage.getItem(THEME_KEY) === 'pink' ? 'pink' : 'blue';
 }
 
 export function setTheme(theme: ThemeName) {
