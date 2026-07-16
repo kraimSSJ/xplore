@@ -30,7 +30,7 @@ export default function Layout() {
     <div className="app-shell">
       <div className="mobile-topbar">
         <img src="/logo.jpeg" alt="Xplore" />
-        <button className="icon-btn" onClick={openCart} style={{ color: '#fff', position: 'relative' }}>
+        <button className="icon-btn" onClick={openCart}>
           Cart {totalItems > 0 && `(${totalItems})`}
         </button>
       </div>
@@ -64,6 +64,19 @@ export default function Layout() {
       <main className="main-content">
         <Outlet />
       </main>
+
+      <nav className="bottom-nav">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`}
+          >
+            <span className="dot" />
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
 
       <CartDrawer />
     </div>
