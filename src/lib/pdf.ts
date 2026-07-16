@@ -3,9 +3,28 @@ import { Order } from '../types';
 
 const NAVY = '#0F1F3D';
 const NAVY_LIGHT = '#1E3A63';
+const PINK = '#C2185B';
+const PINK_LIGHT = '#D6487F';
 const WHITE = '#FFFFFF';
 const GRAY = '#6B7280';
 const BORDER = '#E5E7EB';
+
+const BEAUTY_KEYWORDS = [
+  'beaut', 'cosmet', 'skincare', 'skin care', 'makeup', 'make-up', 'make up',
+  'parfum', 'perfume', 'fragrance', 'serum', 'cream', 'blush', 'lipstick',
+  'nail', 'hair', 'spa', 'body care',
+];
+
+// An order is either fully "girls" (pink/rose) or fully "boys" (navy) — never
+// a blend. Pink only when EVERY item in the order matches a beauty keyword;
+// if a single item doesn't, the whole PDF stays navy.
+function isBeautyOrder(order: Order): boolean {
+  if (!order.items || order.items.length === 0) return false;
+  return order.items.every((item) => {
+    const lower = item.productName.toLowerCase();
+    return BEAUTY_KEYWORDS.some((kw) => lower.includes(kw));
+  });
+}
 
 // Fetches an image URL and returns a data URL jsPDF can embed. Fails
 // silently (returns null) for broken/unreachable/CORS-blocked images,
@@ -27,6 +46,8 @@ async function toDataUrl(url: string): Promise<string | null> {
 }
 
 export async function generateOrderPdf(order: Order): Promise<Blob> {
+  const themeColor = isBeautyOrder(order) ? PINK : NAVY;
+  const themeColorLight = isBeautyOrder(order) ? PINK_LIGHT : NAVY_LIGHT;
   const photoCache = new Map<string, string>();
   await Promise.all(
     Array.from(new Set(order.items.map((i) => i.productPhotoUrl).filter(Boolean) as string[])).map(
@@ -43,7 +64,7 @@ export async function generateOrderPdf(order: Order): Promise<Blob> {
   const marginX = 40;
 
   function header() {
-    doc.setFillColor(NAVY);
+    doc.setFillColor(themeColor);
     doc.rect(0, 0, pageWidth, 90, 'F');
     doc.setTextColor(WHITE);
     doc.setFont('helvetica', 'bold');
@@ -66,7 +87,7 @@ export async function generateOrderPdf(order: Order): Promise<Blob> {
   header();
   let y = 130;
 
-  doc.setTextColor(NAVY);
+  doc.setTextColor(themeColor);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.text(`Ordered by: ${order.user?.fullName || 'Unknown'}`, marginX, y);
@@ -84,7 +105,7 @@ export async function generateOrderPdf(order: Order): Promise<Blob> {
   const tableWidth = pageWidth - marginX * 2;
 
   function tableHeader() {
-    doc.setFillColor(NAVY_LIGHT);
+    doc.setFillColor(themeColorLight);
     doc.rect(marginX, y, tableWidth, 24, 'F');
     doc.setTextColor(WHITE);
     doc.setFont('helvetica', 'bold');
@@ -122,7 +143,7 @@ export async function generateOrderPdf(order: Order): Promise<Blob> {
       }
     }
 
-    doc.setTextColor(NAVY);
+    doc.setTextColor(themeColor);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.text(item.productName, colName, y + 22, { maxWidth: 220 });
@@ -167,7 +188,7 @@ export async function generateOrderPdf(order: Order): Promise<Blob> {
   doc.text(`${shipping.toFixed(2)} MAD`, summaryX + 180, y, { align: 'right' });
 
   y += 22;
-  doc.setFillColor(NAVY);
+  doc.setFillColor(themeColor);
   doc.rect(summaryX, y, 180, 30, 'F');
   doc.setTextColor(WHITE);
   doc.setFont('helvetica', 'bold');
@@ -177,7 +198,7 @@ export async function generateOrderPdf(order: Order): Promise<Blob> {
 
   if (order.adminNotes) {
     y += 50;
-    doc.setTextColor(NAVY);
+    doc.setTextColor(themeColor);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.text('Notes:', marginX, y);
