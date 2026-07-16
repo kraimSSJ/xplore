@@ -34,10 +34,10 @@ export default function Catalog() {
   }
 
   async function loadProducts(sec: typeof section, category: string) {
-    setLoading(true);
     setLoadError('');
     try {
-      setProducts(await fetchProducts(sec, category));
+      const results = await fetchProducts(sec, category);
+      setProducts(results);
     } catch (e: any) {
       console.error('Failed to load products:', e);
       setLoadError(e.message || 'Failed to load products');
