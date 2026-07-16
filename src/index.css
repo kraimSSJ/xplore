@@ -830,46 +830,47 @@ tr:last-child td {
     width: 100%;
   }
 
-  /* Bottom tab bar replaces the sidebar nav on mobile */
-  .bottom-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--bottom-nav-height);
-    background: var(--white);
-    border-top: 1px solid var(--border);
-    z-index: 90;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+.bottom-nav {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-height);
+  background: var(--navy);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 -4px 16px rgba(15,31,61,0.25);
+  z-index: 90;
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
-  .bottom-nav-link {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    color: var(--text-muted);
-    font-size: 11px;
-    font-weight: 600;
-  }
+.bottom-nav-link {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: rgba(255,255,255,0.55);
+  font-size: 11px;
+  font-weight: 600;
+  transition: color 0.15s;
+}
 
-  .bottom-nav-link.active {
-    color: var(--navy);
-  }
+.bottom-nav-link.active {
+  color: var(--white);
+}
 
-  .bottom-nav-link .dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 999px;
-    background: transparent;
-  }
+.bottom-nav-link .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: transparent;
+}
 
-  .bottom-nav-link.active .dot {
-    background: var(--navy);
-  }
+.bottom-nav-link.active .dot {
+  background: var(--white);
+}
 
   .cart-drawer {
     width: 100%;
@@ -930,45 +931,4 @@ tr:last-child td {
   .auth-card {
     padding: 28px 22px;
   }
-}
-.bottom-nav {
-  display: flex;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: var(--bottom-nav-height);
-  background: var(--navy);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 -4px 16px rgba(15,31,61,0.25);
-  z-index: 90;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.bottom-nav-link {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  color: rgba(255,255,255,0.55);
-  font-size: 11px;
-  font-weight: 600;
-  transition: color 0.15s;
-}
-
-.bottom-nav-link.active {
-  color: var(--white);
-}
-
-.bottom-nav-link .dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 999px;
-  background: transparent;
-}
-
-.bottom-nav-link.active .dot {
-  background: var(--white);
 }
