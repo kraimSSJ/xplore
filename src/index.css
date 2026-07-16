@@ -16,6 +16,30 @@
   --bottom-nav-height: 60px;
 }
 
+/* Cosmetics/beauty theme: same variable names, soft pink/rose values.
+   Everything already styled with var(--navy) etc. re-themes automatically —
+   no other CSS rule below needs to change. Toggled by Catalog.tsx (adds
+   data-theme="pink" to <body>) when the selected category looks like
+   beauty/cosmetics. Anything else (electronics, bags, etc) stays navy. */
+body[data-theme="pink"] {
+  --navy: #C2185B;
+  --navy-light: #D6487F;
+  --navy-lighter: #E893B3;
+  --bg: #FFF3F7;
+  --surface: #FFFFFF;
+  --border: #F6D6E3;
+  --text: #4A1029;
+  --text-muted: #A8577B;
+  --shadow: 0 2px 12px rgba(194, 24, 91, 0.10);
+  --shadow-lg: 0 10px 34px rgba(194, 24, 91, 0.18);
+}
+
+.app-shell, .sidebar, .btn, .card, .product-card, .chip, .badge,
+.form-control, .modal-card, .cart-drawer, .bottom-nav, .mobile-topbar,
+.auth-page, .auth-card, .cart-fab, body {
+  transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -45,7 +69,7 @@ button {
 
 input, select, textarea {
   font-family: inherit;
-  font-size: 16px; /* prevents iOS Safari auto-zoom on focus */
+  font-size: 16px;
 }
 
 .app-shell {
@@ -195,6 +219,7 @@ input, select, textarea {
 
 .btn-primary:hover {
   background: var(--navy-light);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
 }
 
 .btn-secondary {
@@ -256,12 +281,17 @@ input, select, textarea {
   font-size: 16px;
   background: var(--white);
   color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .form-control:focus {
   outline: none;
   border-color: var(--navy-lighter);
   box-shadow: 0 0 0 3px rgba(30, 58, 99, 0.12);
+}
+
+body[data-theme="pink"] .form-control:focus {
+  box-shadow: 0 0 0 3px rgba(194, 24, 91, 0.14);
 }
 
 textarea.form-control {
@@ -293,6 +323,7 @@ textarea.form-control {
   width: 100%;
   max-width: 400px;
   box-shadow: var(--shadow-lg);
+  animation: fadeSlideUp 0.4s ease;
 }
 
 .auth-logo {
@@ -355,6 +386,11 @@ textarea.form-control {
   font-weight: 600;
   flex-shrink: 0;
   white-space: nowrap;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.chip:active {
+  transform: scale(0.96);
 }
 
 .chip.active {
@@ -376,12 +412,13 @@ textarea.form-control {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.15s, transform 0.15s;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.3s;
+  animation: fadeSlideUp 0.35s ease;
 }
 
 .product-card:hover {
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 .product-photo {
@@ -398,6 +435,11 @@ textarea.form-control {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-photo img {
+  transform: scale(1.04);
 }
 
 .product-photo-placeholder {
@@ -478,6 +520,11 @@ textarea.form-control {
   color: var(--navy);
   width: 24px;
   height: 24px;
+  transition: transform 0.1s;
+}
+
+.qty-stepper button:active {
+  transform: scale(0.85);
 }
 
 .qty-stepper span {
@@ -523,6 +570,14 @@ tr:last-child td {
   border-bottom: none;
 }
 
+tr {
+  transition: background 0.15s;
+}
+
+tbody tr:hover {
+  background: var(--bg);
+}
+
 .badge {
   display: inline-block;
   padding: 4px 10px;
@@ -541,6 +596,10 @@ tr:last-child td {
 .badge-member {
   background: #E5EAF3;
   color: var(--navy);
+}
+
+body[data-theme="pink"] .badge-member {
+  background: #FBE2EC;
 }
 
 .badge-pending {
@@ -572,7 +631,7 @@ tr:last-child td {
   flex-direction: column;
   z-index: 100;
   transform: translateX(100%);
-  transition: transform 0.25s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease;
 }
 
 .cart-drawer.open {
@@ -584,6 +643,7 @@ tr:last-child td {
   inset: 0;
   background: rgba(15,31,61,0.35);
   z-index: 99;
+  animation: fadeIn 0.2s ease;
 }
 
 .cart-header {
@@ -610,6 +670,7 @@ tr:last-child td {
   gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid var(--border);
+  animation: fadeSlideUp 0.25s ease;
 }
 
 .cart-item img {
@@ -668,10 +729,12 @@ tr:last-child td {
   align-items: center;
   gap: 8px;
   z-index: 50;
+  transition: background 0.3s ease, transform 0.15s;
 }
 
 .cart-fab:hover {
   background: var(--navy-light);
+  transform: translateY(-2px);
 }
 
 .cart-count {
@@ -697,6 +760,7 @@ tr:last-child td {
   justify-content: center;
   z-index: 200;
   padding: 20px;
+  animation: fadeIn 0.15s ease;
 }
 
 .modal-card {
@@ -708,6 +772,7 @@ tr:last-child td {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
+  animation: fadeSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-card h3 {
@@ -778,9 +843,18 @@ tr:last-child td {
   display: none;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ============================================================
-   MOBILE (<= 860px): sidebar becomes a top bar + fixed bottom
-   tab bar. All grids/forms/tables collapse to single column.
+   MOBILE (<= 860px)
    ============================================================ */
 @media (max-width: 860px) {
   .app-shell {
@@ -830,47 +904,47 @@ tr:last-child td {
     width: 100%;
   }
 
-.bottom-nav {
-  display: flex;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: var(--bottom-nav-height);
-  background: var(--navy);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 -4px 16px rgba(15,31,61,0.25);
-  z-index: 90;
-  padding-bottom: env(safe-area-inset-bottom);
-}
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--bottom-nav-height);
+    background: var(--navy);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 -4px 16px rgba(15,31,61,0.25);
+    z-index: 90;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 
-.bottom-nav-link {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  color: rgba(255,255,255,0.55);
-  font-size: 11px;
-  font-weight: 600;
-  transition: color 0.15s;
-}
+  .bottom-nav-link {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: rgba(255,255,255,0.55);
+    font-size: 11px;
+    font-weight: 600;
+    transition: color 0.15s;
+  }
 
-.bottom-nav-link.active {
-  color: var(--white);
-}
+  .bottom-nav-link.active {
+    color: var(--white);
+  }
 
-.bottom-nav-link .dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 999px;
-  background: transparent;
-}
+  .bottom-nav-link .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: transparent;
+  }
 
-.bottom-nav-link.active .dot {
-  background: var(--white);
-}
+  .bottom-nav-link.active .dot {
+    background: var(--white);
+  }
 
   .cart-drawer {
     width: 100%;
