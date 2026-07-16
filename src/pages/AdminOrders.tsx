@@ -23,7 +23,6 @@ export default function AdminOrders() {
   }, []);
 
   async function loadOrders() {
-    setLoading(true);
     try {
       setOrders(await fetchAllOrders());
     } catch (e) {
