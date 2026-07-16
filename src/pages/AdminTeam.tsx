@@ -18,7 +18,6 @@ export default function AdminTeam() {
   }, []);
 
   async function loadUsers() {
-    setLoading(true);
     try {
       setUsers(await fetchUsers());
     } catch (e) {
