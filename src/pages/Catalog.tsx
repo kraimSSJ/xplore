@@ -2,37 +2,45 @@ import { useEffect, useState } from 'react';
 import { fetchProductCategories, fetchProducts } from '../lib/api';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Catalog() {
+  const { section } = useTheme();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [qtyMap, setQtyMap] = useState<Record<string, number>>({});
   const { addToCart, openCart } = useCart();
 
+  // Categories are scoped to the active catalogue (blue/electronics vs
+  // pink/cosmetics), so reset the filter whenever the section switches.
   useEffect(() => {
-    loadCategories();
-  }, []);
+    setActiveCategory('all');
+    loadCategories(section);
+  }, [section]);
 
   useEffect(() => {
-    loadProducts(activeCategory);
-  }, [activeCategory]);
+    loadProducts(section, activeCategory);
+  }, [section, activeCategory]);
 
-  async function loadCategories() {
+  async function loadCategories(sec: typeof section) {
     try {
-      setCategories(await fetchProductCategories());
+      setCategories(await fetchProductCategories(sec));
     } catch (e) {
-      // ignore
+      console.error('Failed to load categories:', e);
     }
   }
 
-  async function loadProducts(category: string) {
+  async function loadProducts(sec: typeof section, category: string) {
     setLoading(true);
+    setLoadError('');
     try {
-      setProducts(await fetchProducts(category));
-    } catch (e) {
-      // ignore
+      setProducts(await fetchProducts(sec, category));
+    } catch (e: any) {
+      console.error('Failed to load products:', e);
+      setLoadError(e.message || 'Failed to load products');
     } finally {
       setLoading(false);
     }
@@ -57,7 +65,10 @@ export default function Catalog() {
       <div className="page-header">
         <div>
           <h1>Product Catalog</h1>
-          <p>Browse available products and build your order.</p>
+          <p>
+            Browse available products and build your order.{' '}
+            <span className="section-pill">{section === 'pink' ? 'Cosmetics' : 'Electronics'}</span>
+          </p>
         </div>
       </div>
 
@@ -79,11 +90,14 @@ export default function Catalog() {
         ))}
       </div>
 
+      {loadError && <div className="error-banner">{loadError}</div>}
+
       {loading && <div className="empty-state">Loading products...</div>}
 
       {!loading && products.length === 0 && (
         <div className="empty-state">
-          No products yet. Ask your Admin to add some to the catalog.
+          No {section === 'pink' ? 'cosmetics' : 'electronics'} products yet. Ask your Admin to add
+          some to this catalogue.
         </div>
       )}
 
