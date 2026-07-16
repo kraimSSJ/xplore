@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import { Order } from '../types';
+import { getTheme } from './theme';
 
 const NAVY = '#0F1F3D';
 const NAVY_LIGHT = '#1E3A63';
@@ -8,23 +9,6 @@ const PINK_LIGHT = '#D6487F';
 const WHITE = '#FFFFFF';
 const GRAY = '#6B7280';
 const BORDER = '#E5E7EB';
-
-const BEAUTY_KEYWORDS = [
-  'beaut', 'cosmet', 'skincare', 'skin care', 'makeup', 'make-up', 'make up',
-  'parfum', 'perfume', 'fragrance', 'serum', 'cream', 'blush', 'lipstick',
-  'nail', 'hair', 'spa', 'body care',
-];
-
-// An order is either fully "girls" (pink/rose) or fully "boys" (navy) — never
-// a blend. Pink only when EVERY item in the order matches a beauty keyword;
-// if a single item doesn't, the whole PDF stays navy.
-function isBeautyOrder(order: Order): boolean {
-  if (!order.items || order.items.length === 0) return false;
-  return order.items.every((item) => {
-    const lower = item.productName.toLowerCase();
-    return BEAUTY_KEYWORDS.some((kw) => lower.includes(kw));
-  });
-}
 
 // Fetches an image URL and returns a data URL jsPDF can embed. Fails
 // silently (returns null) for broken/unreachable/CORS-blocked images,
@@ -46,8 +30,9 @@ async function toDataUrl(url: string): Promise<string | null> {
 }
 
 export async function generateOrderPdf(order: Order): Promise<Blob> {
-  const themeColor = isBeautyOrder(order) ? PINK : NAVY;
-  const themeColorLight = isBeautyOrder(order) ? PINK_LIGHT : NAVY_LIGHT;
+  const isPink = getTheme() === 'pink';
+  const themeColor = isPink ? PINK : NAVY;
+  const themeColorLight = isPink ? PINK_LIGHT : NAVY_LIGHT;
   const photoCache = new Map<string, string>();
   await Promise.all(
     Array.from(new Set(order.items.map((i) => i.productPhotoUrl).filter(Boolean) as string[])).map(
