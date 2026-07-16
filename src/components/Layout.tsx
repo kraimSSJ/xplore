@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -7,6 +8,7 @@ export default function Layout() {
   const { user, logout } = useAuth();
   const { totalItems, openCart } = useCart();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   function handleLogout() {
     logout();
@@ -30,10 +32,38 @@ export default function Layout() {
     <div className="app-shell">
       <div className="mobile-topbar">
         <img src="/logo.jpeg" alt="Xplore" />
-        <button className="icon-btn" onClick={openCart}>
-          Cart {totalItems > 0 && `(${totalItems})`}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <button className="icon-btn" onClick={openCart}>
+            Cart {totalItems > 0 && `(${totalItems})`}
+          </button>
+          <button className="icon-btn" onClick={() => setMenuOpen(true)}>
+            {user?.fullName?.split(' ')[0] || 'Account'}
+          </button>
+        </div>
       </div>
+
+      {menuOpen && (
+        <div className="modal-overlay" onClick={() => setMenuOpen(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 320 }}>
+            <h3>{user?.fullName}</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: -8 }}>
+              {user?.email} &middot; {user?.role}
+            </p>
+            <div className="modal-actions" style={{ justifyContent: 'stretch' }}>
+              <button
+                className="btn btn-secondary"
+                style={{ flex: 1 }}
+                onClick={() => setMenuOpen(false)}
+              >
+                Close
+              </button>
+              <button className="btn btn-danger" style={{ flex: 1 }} onClick={handleLogout}>
+                Log out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <aside className="sidebar">
         <div className="sidebar-logo">
