@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   deleteOrder,
   fetchAllOrders,
+  fetchOrder,
   removeOrderItem,
   updateOrderItem,
   updateOrderShipping,
@@ -45,23 +46,41 @@ export default function AdminOrders() {
     const value = parseFloat(shippingDrafts[order.id] ?? String(order.shippingCost));
     if (isNaN(value)) return;
     await updateOrderShipping(order.id, value);
-    loadOrders();
+    await loadOrders();
   }
 
   async function handleItemQtyChange(order: Order, itemId: string, quantity: number) {
     if (quantity <= 0) return;
     await updateOrderItem(itemId, { quantity });
-    loadOrders();
+    await loadOrders();
   }
 
   async function handleRemoveItem(order: Order, itemId: string) {
     await removeOrderItem(itemId);
-    loadOrders();
+    await loadOrders();
   }
 
   async function handleDeleteOrder(order: Order) {
+    const scrollY = window.scrollY;
     await deleteOrder(order.id);
-    loadOrders();
+    await loadOrders();
+    requestAnimationFrame(() => window.scrollTo(0, scrollY));
+  }
+
+  async function handleDownloadPdf(order: Order) {
+    // Always pull the freshest copy of this exact order straight from the
+    // database right before generating the PDF, instead of trusting
+    // whatever's currently sitting in local component state. This removes
+    // any chance of the PDF reflecting shipping/quantity/item edits that
+    // haven't finished syncing into this page's state yet.
+    try {
+      const fresh = await fetchOrder(order.id);
+      await downloadOrderPdf(fresh);
+    } catch (e) {
+      console.error('Failed to fetch latest order before generating PDF:', e);
+      // Fall back to whatever we have locally rather than failing silently.
+      await downloadOrderPdf(order);
+    }
   }
 
   return (
@@ -204,7 +223,7 @@ export default function AdminOrders() {
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button
                         className="btn btn-secondary btn-sm"
-                        onClick={() => downloadOrderPdf(order)}
+                        onClick={() => handleDownloadPdf(order)}
                       >
                         Download PDF
                       </button>
