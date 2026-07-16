@@ -3,17 +3,6 @@ import { fetchProductCategories, fetchProducts } from '../lib/api';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 
-const BEAUTY_KEYWORDS = [
-  'beaut', 'cosmet', 'skincare', 'skin care', 'makeup', 'make-up', 'make up',
-  'parfum', 'perfume', 'fragrance', 'serum', 'cream', 'blush', 'lipstick',
-  'nail', 'hair', 'spa', 'body care',
-];
-
-function isBeautyCategory(category: string) {
-  const lower = category.toLowerCase();
-  return BEAUTY_KEYWORDS.some((kw) => lower.includes(kw));
-}
-
 export default function Catalog() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -28,18 +17,6 @@ export default function Catalog() {
 
   useEffect(() => {
     loadProducts(activeCategory);
-  }, [activeCategory]);
-
-  // Swap the whole app's color theme (sidebar, buttons, badges, PDF export)
-  // to soft pink/rose whenever a beauty/cosmetics-sounding category is
-  // selected. Everything else (electronics, bags, etc) stays the default
-  // navy blue. Cleared automatically when leaving this page.
-  useEffect(() => {
-    const shouldBePink = activeCategory !== 'all' && isBeautyCategory(activeCategory);
-    document.body.setAttribute('data-theme', shouldBePink ? 'pink' : 'default');
-    return () => {
-      document.body.setAttribute('data-theme', 'default');
-    };
   }, [activeCategory]);
 
   async function loadCategories() {
