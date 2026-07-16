@@ -59,7 +59,7 @@ export default function Layout() {
   return (
     <div className="app-shell">
       <div className="mobile-topbar">
-        <img src="/logo.jpeg" alt="Xplore" />
+        <img src="/f60d2570-cf96-42a4-b024-9bddf61edb2b_20260716_035810_0000.png" alt="Xplore" />
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <button className="icon-btn" onClick={openCart}>
             Cart {totalItems > 0 && `(${totalItems})`}
