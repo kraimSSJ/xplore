@@ -98,7 +98,7 @@ export default function Layout() {
 
       <aside className="sidebar">
         <div className="sidebar-logo">
-          <img src="/logo.jpeg" alt="Xplore" />
+          <img src="/9bddf61edb2b_20260716_035810_0000.png" alt="Xplore" />
         </div>
         <div className="sidebar-section-row">
           <SectionSwitch />
