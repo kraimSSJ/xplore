@@ -11,6 +11,7 @@ export default function AdminTeam() {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [rowError, setRowError] = useState<{ id: string; message: string } | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -51,27 +52,19 @@ export default function AdminTeam() {
     loadUsers();
   }
 
-  function handleDeleteClick(user: User) {
-    // plain browser confirm() — no custom modal, no overlay, no z-index,
-    // nothing that can silently swallow a click. If this alert doesn't
-    // even pop up, the button click isn't reaching React at all.
-    window.alert('DELETE BUTTON CLICKED for ' + user.fullName);
-
+  async function handleDeleteClick(user: User) {
     const ok = window.confirm(
       `Permanently delete ${user.fullName} (${user.email})? This cannot be undone.`,
     );
     if (!ok) return;
-    runDelete(user.id);
-  }
 
-  async function runDelete(id: string) {
-    setBusyId(id);
+    setRowError(null);
+    setBusyId(user.id);
     try {
-      await deleteUser(id);
-      window.alert('Deleted successfully.');
+      await deleteUser(user.id);
       loadUsers();
     } catch (e: any) {
-      window.alert('DELETE FAILED: ' + (e?.message || String(e)));
+      setRowError({ id: user.id, message: e?.message || 'Failed to delete user' });
     } finally {
       setBusyId(null);
     }
@@ -113,7 +106,7 @@ export default function AdminTeam() {
                   </td>
                   <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: 6 }}>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
                       <button className="btn btn-secondary btn-sm" onClick={() => handleRoleToggle(user)}>
                         Make {user.role === 'admin' ? 'Member' : 'Admin'}
                       </button>
@@ -125,6 +118,9 @@ export default function AdminTeam() {
                       >
                         {busyId === user.id ? 'Deleting...' : 'Delete'}
                       </button>
+                      {rowError?.id === user.id && (
+                        <span style={{ color: 'var(--danger)', fontSize: 12 }}>{rowError.message}</span>
+                      )}
                     </div>
                   </td>
                 </tr>
