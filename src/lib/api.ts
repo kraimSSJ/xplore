@@ -15,6 +15,7 @@ function mapProduct(row: any, rate: number): Product {
     reference: row.reference || undefined,
     category: row.category,
     description: row.description || undefined,
+    section: row.section === 'pink' ? 'pink' : 'blue',
     createdAt: row.created_at,
   };
 }
@@ -86,9 +87,13 @@ export async function updateExchangeRate(rate: number): Promise<number> {
 // ----------------------------------------------------------------------------
 // Products
 // ----------------------------------------------------------------------------
-export async function fetchProducts(category?: string): Promise<Product[]> {
+export async function fetchProducts(section: 'blue' | 'pink', category?: string): Promise<Product[]> {
   const rate = await getExchangeRate();
-  let query = supabase.from('products').select('*').order('created_at', { ascending: false });
+  let query = supabase
+    .from('products')
+    .select('*')
+    .eq('section', section)
+    .order('created_at', { ascending: false });
   if (category && category !== 'all') {
     query = query.eq('category', category);
   }
@@ -97,8 +102,8 @@ export async function fetchProducts(category?: string): Promise<Product[]> {
   return (data || []).map((row) => mapProduct(row, rate));
 }
 
-export async function fetchProductCategories(): Promise<string[]> {
-  const { data, error } = await supabase.from('products').select('category');
+export async function fetchProductCategories(section: 'blue' | 'pink'): Promise<string[]> {
+  const { data, error } = await supabase.from('products').select('category').eq('section', section);
   throwIfError(error);
   const set = new Set<string>();
   (data || []).forEach((r: any) => r.category && set.add(r.category));
@@ -112,6 +117,7 @@ export async function createProduct(payload: {
   category?: string;
   description?: string;
   photoUrl?: string;
+  section: 'blue' | 'pink';
 }): Promise<Product> {
   const rate = await getExchangeRate();
   const { data, error } = await supabase
@@ -123,6 +129,7 @@ export async function createProduct(payload: {
       category: payload.category || 'Uncategorized',
       description: payload.description || null,
       photo_url: payload.photoUrl || null,
+      section: payload.section,
     })
     .select('*')
     .single();
@@ -139,6 +146,7 @@ export async function updateProduct(
     category: string;
     description: string;
     photoUrl: string;
+    section: 'blue' | 'pink';
   }>,
 ): Promise<Product> {
   const rate = await getExchangeRate();
@@ -149,6 +157,7 @@ export async function updateProduct(
   if (payload.category !== undefined) patch.category = payload.category;
   if (payload.description !== undefined) patch.description = payload.description;
   if (payload.photoUrl !== undefined) patch.photo_url = payload.photoUrl;
+  if (payload.section !== undefined) patch.section = payload.section;
 
   const { data, error } = await supabase
     .from('products')
