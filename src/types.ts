@@ -17,6 +17,7 @@ export interface Product {
   reference?: string;
   category: string;
   description?: string;
+  section: 'blue' | 'pink';
   createdAt?: string;
 }
 
