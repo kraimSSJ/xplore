@@ -12,7 +12,7 @@ export default function Catalog() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [qtyMap, setQtyMap] = useState<Record<string, number>>({});
-  const { addToCart, openCart } = useCart();
+  const { addToCart } = useCart();
 
   // Categories are scoped to the active catalogue (blue/electronics vs
   // pink/cosmetics), so reset the filter whenever the section switches.
@@ -57,7 +57,6 @@ export default function Catalog() {
   function handleAdd(product: Product) {
     addToCart(product, getQty(product.id));
     setQtyMap((prev) => ({ ...prev, [product.id]: 1 }));
-    openCart();
   }
 
   return (
