@@ -275,23 +275,87 @@ input, select, textarea {
 
 .form-control {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
   font-size: 16px;
   background: var(--white);
   color: var(--text);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.form-control:hover {
+  border-color: var(--navy-lighter);
 }
 
 .form-control:focus {
   outline: none;
-  border-color: var(--navy-lighter);
-  box-shadow: 0 0 0 3px rgba(30, 58, 99, 0.12);
+  border-color: var(--navy);
+  box-shadow: 0 0 0 4px rgba(30, 58, 99, 0.14);
+  transform: translateY(-1px);
 }
 
 body[data-theme="pink"] .form-control:focus {
-  box-shadow: 0 0 0 3px rgba(194, 24, 91, 0.14);
+  box-shadow: 0 0 0 4px rgba(194, 24, 91, 0.16);
+}
+
+/* Manual theme switch (Boys/blue <-> Girls/pink), shown in sidebar + mobile bar */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.theme-switch-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.25);
+  transition: background 0.25s ease;
+  flex-shrink: 0;
+}
+
+.theme-switch[aria-pressed="true"] .theme-switch-track {
+  background: #F472B6;
+  border-color: #F472B6;
+}
+
+.theme-switch-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--white);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-switch[aria-pressed="true"] .theme-switch-thumb {
+  transform: translateX(18px);
+}
+
+.theme-switch-label {
+  color: rgba(255,255,255,0.85);
+  min-width: 32px;
+  text-align: left;
+}
+
+.sidebar-theme-row {
+  padding: 0 24px 16px 24px;
+}
+
+.mobile-topbar .theme-switch-label {
+  display: none;
 }
 
 textarea.form-control {
