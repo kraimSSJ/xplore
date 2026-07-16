@@ -325,55 +325,108 @@ body[data-theme="pink"] .form-control:focus {
    color skin — it decides which set of products is shown/edited everywhere
    in the app, so it's placed prominently at the top of the sidebar (and on
    its own full-width bar on mobile) instead of being a small ambiguous
-   toggle buried near the footer. */
-.section-switch {
-  position: relative;
+   toggle buried near the footer. Built as an animated icon toggle (glowing
+   gradient track + morphing bolt/heart thumb) rather than a flat button. */
+.mode-toggle {
   display: flex;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.mode-toggle-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.mode-toggle-label.active {
+  color: #FFFFFF;
+}
+
+.mode-toggle-track {
+  position: relative;
+  flex-shrink: 0;
+  width: 56px;
+  height: 30px;
   border-radius: 999px;
   padding: 3px;
+  background: linear-gradient(135deg, #1E40AF, #38BDF8);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    0 3px 10px rgba(37, 99, 235, 0.45);
+  transition: background 0.4s ease, box-shadow 0.4s ease;
 }
 
-.section-switch-highlight {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: calc(50% - 3px);
-  height: calc(100% - 6px);
-  background: var(--white);
-  border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+.mode-toggle-track[data-active="pink"] {
+  background: linear-gradient(135deg, #BE185D, #F9A8D4);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    0 3px 10px rgba(219, 39, 119, 0.5);
 }
 
-.section-switch[data-active="pink"] .section-switch-highlight {
-  transform: translateX(100%);
+.mode-toggle:hover .mode-toggle-track {
+  filter: brightness(1.08);
 }
 
-.section-switch-btn {
+.mode-toggle-thumb {
   position: relative;
-  z-index: 1;
-  flex: 1;
-  border: none;
-  background: none;
-  padding: 9px 10px;
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.75);
+  width: 24px;
+  height: 24px;
   border-radius: 999px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.25s ease;
+  background: var(--white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.section-switch-btn.active {
-  color: var(--navy);
+.mode-toggle-track[data-active="pink"] .mode-toggle-thumb {
+  transform: translateX(26px);
 }
 
-.section-switch.compact .section-switch-btn {
-  padding: 7px 8px;
-  font-size: 12px;
+.mode-toggle-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.icon-bolt {
+  color: #2563EB;
+  opacity: 1;
+}
+
+.icon-heart {
+  color: #DB2777;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.4) rotate(-45deg);
+}
+
+.mode-toggle-track[data-active="pink"] .icon-bolt {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.4) rotate(45deg);
+}
+
+.mode-toggle-track[data-active="pink"] .icon-heart {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1) rotate(0deg);
+}
+
+.mode-toggle.compact {
+  width: auto;
+  gap: 8px;
+}
+
+.mode-toggle.compact .mode-toggle-label {
+  display: none;
 }
 
 .sidebar-section-row {
@@ -1061,6 +1114,7 @@ body[data-theme="pink"] .badge-member {
 
   .mobile-section-bar {
     display: flex;
+    justify-content: center;
     background: var(--navy);
     padding: 0 16px 12px 16px;
     position: sticky;
@@ -1068,8 +1122,8 @@ body[data-theme="pink"] .badge-member {
     z-index: 79;
   }
 
-  .mobile-section-bar .section-switch {
-    width: 100%;
+  .mobile-section-bar .mode-toggle {
+    width: auto;
   }
 
   .main-content {
