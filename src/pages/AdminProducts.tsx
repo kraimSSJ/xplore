@@ -44,7 +44,6 @@ export default function AdminProducts() {
   }, [section]);
 
   async function loadProducts() {
-    setLoading(true);
     setLoadError('');
     try {
       setProducts(await fetchProducts(section));
