@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { getTheme, setTheme } from '../lib/theme';
 import CartDrawer from './CartDrawer';
 
 export default function Layout() {
@@ -9,6 +10,17 @@ export default function Layout() {
   const { totalItems, openCart } = useCart();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pink, setPink] = useState(() => getTheme() === 'pink');
+
+  useEffect(() => {
+    setTheme(pink ? 'pink' : 'default');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function toggleTheme() {
+    const next = !pink;
+    setPink(next);
+    setTheme(next ? 'pink' : 'default');
+  }
 
   function handleLogout() {
     logout();
@@ -33,6 +45,18 @@ export default function Layout() {
       <div className="mobile-topbar">
         <img src="/logo.jpeg" alt="Xplore" />
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <button
+            type="button"
+            className="theme-switch"
+            aria-pressed={pink}
+            aria-label="Toggle pink theme"
+            onClick={toggleTheme}
+          >
+            <span className="theme-switch-track">
+              <span className="theme-switch-thumb" />
+            </span>
+            <span className="theme-switch-label">{pink ? 'Pink' : 'Blue'}</span>
+          </button>
           <button className="icon-btn" onClick={openCart}>
             Cart {totalItems > 0 && `(${totalItems})`}
           </button>
@@ -80,6 +104,20 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+        <div className="sidebar-theme-row">
+          <button
+            type="button"
+            className="theme-switch"
+            aria-pressed={pink}
+            aria-label="Toggle pink theme"
+            onClick={toggleTheme}
+          >
+            <span className="theme-switch-track">
+              <span className="theme-switch-thumb" />
+            </span>
+            <span className="theme-switch-label">{pink ? 'Pink' : 'Blue'}</span>
+          </button>
+        </div>
         <div className="sidebar-footer">
           <div className="sidebar-user">
             <strong>{user?.fullName}</strong>
