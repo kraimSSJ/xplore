@@ -11,6 +11,7 @@ export default function AdminTeam() {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<{ id: string; message: string } | null>(null);
 
   useEffect(() => {
@@ -52,14 +53,10 @@ export default function AdminTeam() {
     loadUsers();
   }
 
-  async function handleDeleteClick(user: User) {
-    const ok = window.confirm(
-      `Permanently delete ${user.fullName} (${user.email})? This cannot be undone.`,
-    );
-    if (!ok) return;
-
+  async function handleConfirmDelete(user: User) {
     setRowError(null);
     setBusyId(user.id);
+    setConfirmId(null);
     try {
       await deleteUser(user.id);
       loadUsers();
@@ -106,22 +103,42 @@ export default function AdminTeam() {
                   </td>
                   <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                      <button className="btn btn-secondary btn-sm" onClick={() => handleRoleToggle(user)}>
-                        Make {user.role === 'admin' ? 'Member' : 'Admin'}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-danger btn-sm"
-                        disabled={busyId === user.id}
-                        onClick={() => handleDeleteClick(user)}
-                      >
-                        {busyId === user.id ? 'Deleting...' : 'Delete'}
-                      </button>
-                      {rowError?.id === user.id && (
-                        <span style={{ color: 'var(--danger)', fontSize: 12 }}>{rowError.message}</span>
-                      )}
-                    </div>
+                    {confirmId === user.id ? (
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>Sure?</span>
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-sm"
+                          disabled={busyId === user.id}
+                          onClick={() => handleConfirmDelete(user)}
+                        >
+                          {busyId === user.id ? 'Deleting...' : 'Yes, delete'}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setConfirmId(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <button className="btn btn-secondary btn-sm" onClick={() => handleRoleToggle(user)}>
+                          Make {user.role === 'admin' ? 'Member' : 'Admin'}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-danger btn-sm"
+                          onClick={() => setConfirmId(user.id)}
+                        >
+                          Delete
+                        </button>
+                        {rowError?.id === user.id && (
+                          <span style={{ color: 'var(--danger)', fontSize: 12 }}>{rowError.message}</span>
+                        )}
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
